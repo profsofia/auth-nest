@@ -66,25 +66,30 @@ export class AuthService {
       throw new UnauthorizedException('this password is not correctly');
     }
 
-    const { password: _,  } = user.toJSON();
+    const { password: _ } = user.toJSON();
     return {
       user,
-      token: this.getJwt({id: user.id}),
+      token: this.getJwt({ id: user.id }),
     };
   }
 
-  async register(registerUser: RegisterDto): Promise<LoginResponse>{
-
-
+  async register(registerUser: RegisterDto): Promise<LoginResponse> {
     const user = await this.create(registerUser);
-    return{
+    return {
       user,
-      token: this.getJwt({id: user._id})
-    }
+      token: this.getJwt({ id: user._id }),
+    };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+ async findUserById(id: string) {
+    const user = await this.userModel.findById(id);
+    //desestructuramos para quitar la contraseña y toJSON para asegurarnos que no vengan los métodos del modelo
+    const {password, ...rest}= user.toJSON();
+    return rest;
+  }
+
+  findAll(): Promise<User[]> {
+    return this.userModel.find();
   }
 
   findOne(id: number) {
